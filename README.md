@@ -76,7 +76,7 @@ There absolutely should be a "math" protocol added at some future point with all
 
 Longer answer: because returning `Self` is more correct and more useful.  Either operation can be constructed from the other.  If you have the version that returns `Self`, then the operation returning `Int` is just:
 ~~~
-let integerResult = Int(x.rounded(.up))
+let integerResult = Int(x.rounded(.up))                      [1]
 ~~~
 Simple, easy to write, and hard to screw up.  If you only have the version that returns `Int`, the situation is more complicated.  If you're lucky and `Int` is bigger than the significand of the floating-point type, you can do something along the following lines (this is a little bit fast and loose, intended only for illustration):
 ~~~
@@ -85,4 +85,6 @@ if x <= Self(Int.min) || x >= Self(Int.max) || x.isNaN {
 }
 return Self(x.rounded(.up))
 ~~~
-That's already obviously more complicated than what we saw above, but the situation where `Int` is *smaller* than the significand of the floating-point type is *much* worse.  In order to handle such cases correctly, you need to essentially re-implement all of the rounding logic.
+This works because of the assumption that `Int` was wider than the significand; thus any value outside the range of `Int` is necessarily already an integer.
+
+This is already obviously more complicated than what we saw in [1], but the situation where `Int` is *smaller* than the significand of the floating-point type is *much* worse.  In order to handle such cases correctly, you need to re-implement all of the rounding logic; why bother having a rounding function in the standard library at all?
