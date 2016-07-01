@@ -69,3 +69,20 @@ This rounds correctly to two digits, and is simpler as well.
 **A**: The `FloatingPoint` and `BinaryFloatingPoint` protocols stick tightly to the requirements of IEEE 754, with a small number of additional convenience operations added.  This makes them useful for performing arithmetic, and also for *implementing* a math library, but they don't have all the math operations that folks want.  The trouble with throwing in everything that everyone could want is that the protocols become huge and a major burden for implementors who want to conform to them.  My goal in speccing these was to require only what's necessary to be a useful IEEE 754 floating-point type.
 
 There absolutely should be a "math" protocol added at some future point with all the usual math library operations.
+
+**Q**: Why doesn't `rounded` return an `Int`?
+
+**A**: Short answer: because IEEE 754 requires rounding functions that return `Self`.
+
+Longer answer: because returning `Self` is more correct and more useful.  Either operation can be constructed from the other.  If you have the version that returns `Self`, then the operation returning `Int` is just:
+~~~
+let integerResult = Int(x.rounded(.up))
+~~~
+Simple, easy to write, and hard to screw up.  If you only have the version that returns `Int`, the situation is more complicated.  If you're lucky and `Int` is bigger than the significand of the floating-point type, you can do something along the following lines (this is a little bit fast and loose, intended only for illustration):
+~~~
+if x <= Self(Int.min) || x >= Self(Int.max) || x.isNaN {
+  return x
+}
+return Self(x.rounded(.up))
+~~~
+That's already obviously more complicated than what we saw above, but the situation where `Int` is *smaller* than the significand of the floating-point type is *much* worse.  In order to handle such cases correctly, you need to essentially re-implement all of the rounding logic.
