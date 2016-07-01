@@ -1,7 +1,7 @@
 # On floating-point in Swift
 Steve Canon (@stephentyrone), July 2016
 
-## Frequently asked questions (and rejected proposals)
+## Frequently asked questions
 **Q**: Why is `.pi` special?  Why isn't `tau`/`e`/`oneOverPi` also available on `FloatingPoint`?
 
 **A**: There are *lots* of important constants in mathematics.  POSIX defines the following macros in C:
