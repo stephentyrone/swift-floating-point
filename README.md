@@ -46,6 +46,24 @@ Many languages have responded to user demand and provided such a function.  This
 
 What went wrong here?  Well, nothing did, except for the library providing an interface that cannot possibly work as users expect it to.  The trouble is that `13.95` is not representable as a binary floating-point number; in general, very few numbers with one or more digits after the decimal point *are* representable.  So if you try to "round `a` to two decimal digits", you get the closest representable value to `13.95`, which is `13.949999999999999289457264239899814128875732421875`.  If subsequent computations assume you have an exact two-digit decimal value, they will misbehave and produce incorrect results.
 
+Here's an example of that in action:
+~~~
+>>> a = .291
+>>> b = int(100*round(a,2))
+~~~
+What should `b` be?  Surely `a` rounded to two digits is `.29`, so `b` should be exactly `29`.  What value does `b` actually have?
+~~~
+>>> b
+28
+~~~
+OK, so what should users do instead?  Rounding to some number of decimal digits is a well-defined operation only on *decimal* representations.  So if you need to perform this operation, there are two options:
+- Use a decimal number type.
+- Since you usually want to perform this rounding for the purposes of display, round as part of formatting the number, rather than as a separate operation:
+~~~
+let toDisplay = String(format: "%.2f", a)
+~~~
+This rounds correctly to two digits, and is simpler as well.
+
 **Q**: Why aren't math functions like `sin`/`log`/`pow` included?
 
 **A**: The `FloatingPoint` and `BinaryFloatingPoint` protocols stick tightly to the requirements of IEEE 754, with a small number of additional convenience operations added.  This makes them useful for performing arithmetic, and also for *implementing* a math library, but they don't have all the math operations that folks want.  The trouble with throwing in everything that everyone could want is that the protocols become huge and a major burden for implementors who want to conform to them.  My goal in speccing these was to require only what's necessary to be a useful IEEE 754 floating-point type.
