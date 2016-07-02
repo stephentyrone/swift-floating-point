@@ -1,4 +1,4 @@
-# On floating-point in Swift
+# Notes on floating-point in Swift
 Steve Canon (@stephentyrone), July 2016
 
 ## Frequently asked questions
